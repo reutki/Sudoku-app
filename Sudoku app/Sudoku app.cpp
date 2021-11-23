@@ -1,5 +1,5 @@
 #include <iostream>
-#define N 9 //vor fi 9 subgriduri 
+#define N 9 //grid de 3x3 
 using namespace std;
 
 //initializam gridul principal
@@ -16,7 +16,7 @@ int grid[N][N] = {
 };
 
 //facem check daca este  numarul prezent in coloana
-bool isPresentInCol(int col, int num) {
+bool prezentCol(int col, int num) {
     for (int row = 0; row < N; row++)
         if (grid[row][col] == num)
             return true;
@@ -24,13 +24,13 @@ bool isPresentInCol(int col, int num) {
 }
 
 //facem check daca este  numarul prezent pe rand
-bool isPresentInRow(int row, int num) {
+bool prezentRand(int row, int num) {
     for (int col = 0; col < N; col++)
         if (grid[row][col] == num)
             return true;
     return false;
 }
-bool isPresentInBox(int boxStartRow, int boxStartCol, int num) {
+bool prezentInBox(int boxStartRow, int boxStartCol, int num) {
     //facem check daca numarul e prezent intr-un tabel de 3x3 sau nu
     for (int row = 0; row < 3; row++)
         for (int col = 0; col < 3; col++)
@@ -54,26 +54,26 @@ void sudokuGrid() {
         cout << endl;
     }
 }//gasim locurile goale si facem update la randuri si coloane
-bool findEmptyPlace(int& row, int& col) {
+bool liber(int& row, int& col) {
     for (row = 0; row < N; row++)
         for (col = 0; col < N; col++)
             if (grid[row][col] == 0) //daca e 0 atunci e gol
                 return true;
     return false;
 }
-bool isValidPlace(int row, int col, int num) {
+bool valid(int row, int col, int num) {
     //cand nu e gasit itemul in col, rand si suntem in boxul 3x3
-    return !isPresentInRow(row, num) && !isPresentInCol(col, num) && !isPresentInBox(row - row % 3,
+    return !prezentRand(row, num) && !prezentCol(col, num) && !prezentInBox(row - row % 3,
         col - col % 3, num);
 }
-bool solveSudoku() {
+bool sudokuSolver() {
     int row, col;
-    if (!findEmptyPlace(row, col))
+    if (!liber(row, col))
         return true; //cand toate locurile din grid sunt completate
     for (int num = 1; num <= 9; num++) { //numerele valide sunt doar de la 1 la 9
-        if (isValidPlace(row, col, num)) { // controlam validarea, daca numerele sunt conform cerintelor, ele ajung in grid
+        if (valid(row, col, num)) { // controlam validarea, daca numerele sunt conform cerintelor, ele ajung in grid
             grid[row][col] = num;
-            if (solveSudoku()) //recursiv va lucra si pentru alte boxuri din grid
+            if (sudokuSolver()) //recursiv va lucra si pentru alte boxuri din grid
                 return true;
             grid[row][col] = 0;
         }
@@ -81,7 +81,7 @@ bool solveSudoku() {
     return false;
 }
 int main() {
-    if (solveSudoku() == true)//daca solutia exista va afisa rezultatul
+    if (sudokuSolver() == true)//daca solutia exista va afisa rezultatul
         sudokuGrid();
     else // daca solutia nu exista va afisa mesajul de mai jos
         cout << "Nu exista solutii";
